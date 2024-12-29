@@ -4,6 +4,7 @@
 # details.
 
 import os
+import ssl
 
 from flask import Flask
 from flask_compress import Compress
@@ -90,7 +91,7 @@ def inject_context():
 from celery import Celery
 
 app.config['CELERY_BROKER_URL'] = settings.BROKER_URI
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'], broker_use_ssl={'ssl_cert_reqs': ssl.CERT_NONE})
 celery.conf.update(app.config)
 
 from gavel.models import db, ma
@@ -106,7 +107,7 @@ ma.init_app(app)
 SOCKETIO_REDIS_URL = settings.BROKER_URI
 async_mode="eventlet"
 
-socketio = SocketIO(app, async_mode=async_mode, message_queue=SOCKETIO_REDIS_URL, async_handlers=True)
+socketio = SocketIO(app, async_mode=async_mode, message_queue=SOCKETIO_REDIS_URL, async_handlers=True, )
 
 import gavel.template_filters  # registers template filters
 
